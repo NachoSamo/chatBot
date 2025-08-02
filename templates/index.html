@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chef-GPT Asistente de Cocina</title>
+    <style>
+        body { font-family: 'Comic Sans MS', cursive, sans-serif; max-width: 700px; margin: auto; padding: 20px; background-color: #fff9e6; }
+        h1 { color: #ff6347; text-align: center; }
+        #chatbox { height: 400px; border: 2px solid #ffdab9; border-radius: 10px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background-color: #ffffff; }
+        .user-msg { text-align: right; color: #007bff; margin: 5px 0; }
+        .bot-msg { text-align: left; color: #28a745; margin: 5px 0; }
+        .msg-container { padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 80%; }
+        .user-msg .msg-container { background-color: #e7f3ff; }
+        .bot-msg .msg-container { background-color: #e2f0d9; }
+        #input-area { display: flex; }
+        #userInput { flex-grow: 1; padding: 10px; border: 2px solid #ffdab9; border-radius: 20px; }
+        #sendBtn { padding: 10px 20px; margin-left: 10px; background-color: #ff6347; color: white; border: none; border-radius: 20px; cursor: pointer; }
+        #sendBtn:hover { background-color: #e5533d; }
+    </style>
+</head>
+<body>
+    <h1>Asistente de Cocina </h1>
+    <div id="chatbox">
+        <div class="bot-msg">
+            <div class="msg-container"><strong>Chef-GPT:</strong> ¡Hola, gourmet! Soy Chef-GPT, tu ayudante en la cocina. ¿Qué delicia vamos a preparar hoy?</div>
+        </div>
+    </div>
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Pídeme una receta o una idea..." onkeydown="if(event.keyCode===13) sendMessage()">
+        <button id="sendBtn" onclick="sendMessage()">¡A cocinar!</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value;
+            if (message.trim() === '') return;
+
+            const chatbox = document.getElementById('chatbox');
+            
+            // Mostrar mensaje del usuario
+            chatbox.innerHTML += `<div class="user-msg"><div class="msg-container"><strong>Tú:</strong> ${message}</div></div>`;
+            userInput.value = '';
+
+            // Mostrar un indicador de que el bot está "pensando"
+            chatbox.innerHTML += `<div class="bot-msg" id="thinking"><div class="msg-container"><strong>Chef-GPT:</strong> Mmm, déjame pensar... 🤔</div></div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            // Enviar mensaje al servidor
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+
+            // Quitar el indicador de "pensando"
+            document.getElementById('thinking').remove();
+
+            const data = await response.json();
+
+            // Mostrar respuesta del bot
+            // Usamos innerText para evitar problemas de renderizado de HTML si la respuesta contiene < o >
+            const botResponseContainer = document.createElement('div');
+            botResponseContainer.classList.add('bot-msg');
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.classList.add('msg-container');
+            botMsgDiv.innerHTML = `<strong>Chef-GPT:</strong> ${data.response.replace(/\n/g, '<br>')}`; // Reemplazamos saltos de línea por <br>
+            botResponseContainer.appendChild(botMsgDiv);
+            chatbox.appendChild(botResponseContainer);
+            
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
