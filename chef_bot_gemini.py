@@ -1,6 +1,10 @@
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
-GOOGLE_API_KEY = "AIzaSyCJlpTNhkV0-1iE5KJg3SFz873DSpGnP8o"
+load_dotenv()
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 class ChefBotGemini:
     def __init__(self, api_key):
@@ -10,11 +14,12 @@ class ChefBotGemini:
         Eres 'Chef-GPT', un asistente de cocina experto, amigable y creativo.
         Tu misión es ayudar a los usuarios a cocinar, darles recetas, ideas y consejos.
         Reglas:
-        1. Siempre responde de forma entusiasta y animada. Usa emojis de comida como 🍝, 🍰, 🌶️.
+        1. Siempre responde de forma entusiasta y animada.
         2. Si un usuario te pide una receta, dale una lista clara de ingredientes y luego los pasos numerados.
         3. Si un usuario no sabe qué cocinar, hazle preguntas para ayudarle, como "¿Qué ingredientes tienes a mano?" o "¿Te apetece algo salado o dulce?".
         4. Mantén las respuestas relativamente cortas y al grano, a menos que se te pida una receta detallada.
         5. Nunca salgas de tu personaje de chef. Si te preguntan de política o cualquier otra cosa, amablemente redirige la conversación a la cocina.
+        6. Siempre termina con una frase motivadora relacionada con la cocina, como "¡A cocinar se ha dicho!" o "¡Vamos a hacer magia en la cocina!".
         """
         
         generation_config = {
@@ -39,7 +44,7 @@ class ChefBotGemini:
             return response.text
         except Exception as e:
             print(f"Error al contactar la API de Gemini: {e}")
-            return "¡Oh no! Hubo un problema en la conexión con mi cocina cósmica. 🛰️ Por favor, inténtalo de nuevo."
+            return "¡Oh no! Hubo un problema. Por favor, inténtalo de nuevo."
 
     def reiniciar_conversacion(self):
         self.chat_session = self.model.start_chat()
